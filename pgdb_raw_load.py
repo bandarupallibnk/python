@@ -2,9 +2,11 @@ import psycopg2
 import sys
 from edate import cl_date
 
+# double seq odd
 optype = sys.argv[1]
-targettblname = sys.argv[2]
 fpathdict = {"double":"/Users/nandabandarupalli/Documents/python/doubledata/","seq":"/Users/nandabandarupalli/Documents/python/seqdata/","odd":"/Users/nandabandarupalli/Documents/python/seqodd/"}
+ftbldict = {"double":"stg_raw_data_double","seq":"stg_raw_seqadd","odd":"stg_raw_data_odd"}
+targettblname = ftbldict[optype]
 
 print(optype)
 print(targettblname)
