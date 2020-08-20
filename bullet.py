@@ -16,6 +16,7 @@ class bullet():
 		self.maxbsize = self.units*8
 		self.dt = cl_date()
 		self.stoday = self.dt.fcurrentdate()
+		self.repeat_count = 0
 
 
 
@@ -65,6 +66,7 @@ class bullet():
 				repeatcount  = 0
 		if repeatcount > repeatmax:
 			repeatmax = repeatcount
+		self.repeat_count = repeatmax
 		print('The repeat count is {}'.format(repeatmax))
 
 	# Deduct everytime before counting
@@ -81,7 +83,7 @@ class bullet():
 
 	def printformat(self,curround,i,binval,activeval,result,finval):
 		output = curround + "\t" +  str(i) + "\t" +  str(binval) + "\t" + str(activeval) + "\t" + str(result) + "\t" + str(finval) + "\n"
-		print (output)
+		#print (output)
 		return output
 
 	#Increment self.units by multiple of self.units like 10,20,40,80
@@ -111,15 +113,18 @@ class bullet():
 				fdouble.write(printformat(curround,i,blist[i],activeval,result,finval))
 				activeval = setmaxbsize(activeval)
 
-	#Increment units by adding units sequentially like 10,20,30,40
+
+#Increment units by adding units sequentially like 10,20,30,40
 	def calculateadd(self,curround,blist,fpath):
 		activeval = self.units
 		result = 1
 		finval = self.start
 		fseq = open(fpath,'a')
+		rptcnt = 0
 		for i in range(0,self.size):
 			finval = self.roll(finval,activeval)
 			if blist[i] == -1:
+				rptcnt = 0
 				result = activeval*0
 				finval = finval + result
 				fseq.write(self.printformat(curround,i,blist[i],activeval,result,finval))
@@ -127,15 +132,50 @@ class bullet():
 				if(activeval < self.units):
 					activeval = self.units
 			elif blist[i] == blist[i-1] == 1:
+				rptcnt = rptcnt + 1
 				result = activeval*3
 				finval = finval + result 
 				fseq.write(self.printformat(curround,i,blist[i],activeval,result,finval))
 				activeval = activeval + self.units
 			elif blist[i] == 1:
+				rptcnt = rptcnt + 1
 				result = activeval*3
 				finval = finval + result 
 				fseq.write(self.printformat(curround,i,blist[i],activeval,result,finval))
 				activeval = activeval + self.units
+			if rptcnt >3:
+				break
+			else:
+				pass
+
+	#Increment units by adding units sequentially like 10,20,30,40
+	def calculateadd_limit2(self,curround,blist,fpath):
+		activeval = self.units
+		result = 1
+		finval = self.start
+		rptcnt = 0
+		fseq = open(fpath,'a')
+		for i in range(0,self.size):
+			finval = self.roll(finval,activeval)
+			if blist[i] == -1:
+				rptcnt = 0
+				result = activeval*0
+				finval = finval + result
+				fseq.write(self.printformat(curround,i,blist[i],activeval,result,finval))
+				activeval =  self.units
+			elif blist[i] == blist[i-1] == 1 and i!=0:
+				rptcnt = rptcnt + 1
+				result = activeval*3
+				finval = finval + result 
+				fseq.write(self.printformat(curround,i,blist[i],activeval,result,finval))
+				activeval = activeval+ self.units
+			elif blist[i] == 1:
+				rptcnt = rptcnt + 1
+				result = activeval*3
+				finval = finval + result 
+				fseq.write(self.printformat(curround,i,blist[i],activeval,result,finval))
+				activeval =  activeval + self.units
+			
 
 	#Increment units by adding units sequentially like 10,20,30,40
 	def calculateadd_odd(self,curround,blist,fpath):
@@ -170,7 +210,7 @@ class bullet():
 		calculatedouble(curround,blist,fpath) 
 
 	def writeseq(self,curround,blist):
-		self.calculateadd(curround,blist,self.fpath)
+		self.calculateadd_limit2(curround,blist,self.fpath)
 
 	def writeodd(self,curround,blist):
 		fpath = '/Users/nandabandarupalli/Documents/python/seqodd/' + stoday + '.txt'
